@@ -332,6 +332,101 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   }
 
+
+  /* Google Maps */
+  .mapa-btn {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 10.5px; font-weight: 600;
+    text-decoration: none;
+    background: rgba(30,74,138,0.10);
+    color: inherit;
+    border: 1px solid rgba(30,74,138,0.30);
+    border-radius: 12px;
+    padding: 2px 8px 2px 6px;
+    line-height: 1.5;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+    cursor: pointer;
+  }
+  .mapa-btn:hover { background: var(--azul-claro); color: #fff; transform: translateY(-1px); }
+  .nivel-0 > .nodo-cabecera .mapa-btn, .nivel-1 > .nodo-cabecera .mapa-btn {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.35);
+    color: #fff;
+  }
+  .nivel-0 > .nodo-cabecera .mapa-btn:hover, .nivel-1 > .nodo-cabecera .mapa-btn:hover {
+    background: var(--oro-claro); color: var(--azul);
+  }
+
+  .mapa-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,31,60,0.78);
+    z-index: 700; align-items: center; justify-content: center;
+    padding: 18px;
+  }
+  .mapa-modal-overlay.visible { display: flex; }
+  .mapa-modal {
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    width: 94vw; max-width: 1100px; height: 82vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    border: 2px solid var(--oro);
+  }
+  .mapa-modal-header {
+    background: var(--azul); border-bottom: 2px solid var(--oro);
+    padding: 10px 16px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;
+  }
+  .mapa-modal-header-top {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mapa-modal-titulo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 700; color: var(--oro-claro);
+    letter-spacing: 0.5px; flex: 1;
+  }
+  .mapa-modal-direccion {
+    font-family: 'Barlow', sans-serif; font-size: 11px; color: #dce7f5;
+    margin-top: 2px; font-weight: 400;
+  }
+  .mapa-abrir-fila {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .mapa-abrir {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+    text-decoration: none; color: var(--azul);
+    background: var(--oro-claro);
+    border: 1px solid rgba(232,201,122,0.7); border-radius: 6px;
+    padding: 8px 10px; white-space: nowrap;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    flex: 0 0 auto;
+  }
+  .mapa-abrir:hover { background: var(--oro); }
+  .mapa-cerrar {
+    width: 32px; height: 32px; border-radius: 6px;
+    border: none; background: rgba(255,255,255,0.08);
+    color: #fff; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s; margin-left: 4px;
+  }
+  .mapa-cerrar:hover { background: rgba(220,50,50,0.4); }
+  .mapa-cuerpo { flex: 1; background: #e8ecf2; position: relative; }
+  #mapaFrame { width: 100%; height: 100%; border: 0; display: block; }
+  .mapa-ayuda {
+    position: absolute; left: 12px; bottom: 12px;
+    background: rgba(255,255,255,0.92); color: #33445c;
+    border-radius: 5px; padding: 6px 9px; font-size: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.16); pointer-events: none;
+  }
+  @media (max-width: 600px) {
+    .mapa-modal-overlay { padding: 8px; }
+    .mapa-modal { width: 98vw; height: 86vh; }
+    .mapa-modal-header { padding: 8px 10px; }
+    .mapa-abrir { font-size: 12px; padding: 9px 10px; }
+    .mapa-modal-titulo { font-size: 13px; }
+    .mapa-modal-direccion { font-size: 9px; }
+  }
+
   @media (max-width: 600px) {
     header { padding: 8px 10px; gap: 8px; position: relative; }
     header img { width: 52px; height: 52px; }
@@ -371,6 +466,29 @@
     <input type="search" id="buscador" placeholder="Buscar área, sección…" oninput="buscar(this.value)" autocomplete="off">
   </div>
   <span class="conteo" id="conteo"></span>
+</div>
+
+
+<!-- Modal Google Maps -->
+<div class="mapa-modal-overlay" id="mapaModalOverlay" onclick="cerrarMapaModalOverlay(event)">
+  <div class="mapa-modal" id="mapaModal">
+    <div class="mapa-modal-header">
+      <div class="mapa-modal-header-top">
+        <div style="flex:1;min-width:0;">
+          <div class="mapa-modal-titulo" id="mapaTitulo">📍 Ubicación</div>
+          <div class="mapa-modal-direccion" id="mapaDireccion"></div>
+        </div>
+        <button class="mapa-cerrar" onclick="cerrarMapaModal()" title="Cerrar">✕</button>
+      </div>
+      <div class="mapa-abrir-fila">
+        <a class="mapa-abrir" id="mapaAbrir" href="#" target="_blank" rel="noopener noreferrer">↗ Abrir en Google Maps</a>
+      </div>
+    </div>
+    <div class="mapa-cuerpo">
+      <iframe id="mapaFrame" title="Mapa de ubicación" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="mapa-ayuda">La ubicación se obtiene de la dirección cargada en el organigrama.</div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal PDF -->
@@ -440,6 +558,44 @@
     se limpia automáticamente para armar el enlace tel:.
   - Si un área no tiene teléfono, simplemente no agregues esas propiedades.
 */
+
+/*
+  CÓMO CORREGIR O AGREGAR LA UBICACIÓN EN EL MAPA
+  ------------------------------------------------
+  Por defecto, el botón "Mapa" busca en Google Maps la dirección que figura
+  en el "nombre" del nodo (después del primer " - "). Eso funciona bien la
+  mayoría de las veces, pero a veces Google no reconoce bien esa dirección,
+  o directamente la dependencia no tiene una dirección de calle (zona rural,
+  "s/nº", "Calle Sin Nombre", etc.).
+
+  Para esos casos, podés fijar la ubicación exacta agregando las propiedades
+  "lat" y "lng" (latitud y longitud) al nodo, igual que se hace con "fijo" o
+  "celular":
+
+    {
+      nombre: "COMISARÍA EJEMPLO - Ruta 38 km 12",
+      lat: -27.1234,
+      lng: -65.4321
+    }
+
+  - Los números van con punto decimal (no coma) y con el signo "-" si
+    corresponde (en Tucumán, tanto la latitud como la longitud son
+    negativas).
+  - Para conseguir esos números: abrí Google Maps (maps.google.com), buscá o
+    hacé clic derecho sobre el punto exacto del mapa, elegí "¿Qué hay aquí?"
+    y copiá los dos números que aparecen (el primero es la latitud, el
+    segundo la longitud).
+  - Si cargás "lat" y "lng", el botón "Mapa" usará esas coordenadas exactas
+    en lugar de intentar adivinar la dirección por texto (mucho más
+    preciso).
+  - Estos números NUNCA se muestran en pantalla: solo se usan por dentro
+    para ubicar el punto en el mapa. La persona que use el organigrama
+    siempre ve el nombre de la dependencia y su dirección (si la tiene),
+    nunca las coordenadas.
+  - Podés combinar "lat"/"lng" con una dirección en el "nombre" sin
+    problema: la dirección se sigue mostrando como texto, pero el mapa se
+    ubica con las coordenadas.
+*/
 const datos = {
   nombre: "JEFATURA DE POLICÍA - Italia 2601",
   hijos: [
@@ -499,6 +655,8 @@ const datos = {
     },
     {
       nombre: "DIRECCIÓN DE ADMINISTRACIÓN - Italia 2601",
+      lat: -26.808809, 
+      lng: -65.233413,
       hijos: [
         {
           nombre: "DIRECCIÓN"
@@ -619,7 +777,7 @@ const subjefatura = {
       ]
     },
     {
-      nombre: "DEPARTAMENTO INTELIGENCIA CRIMINAL (D-2) - Av Sáenz Peña 860", fijo: "03814204229", celular: "3814426298",
+      nombre: "DEPARTAMENTO INTELIGENCIA CRIMINAL (D-2) - Av Sáenz Peña 870", fijo: "03814204229", celular: "3814426298",
       hijos: [
         {
           nombre: "JEFATURA DEPARTAMENTAL",
@@ -713,6 +871,8 @@ const subjefatura = {
     },
     {
       nombre: "DEPARTAMENTO LOGÍSTICA (D-4) - Italia 2601", fijo: "03814331099",
+      lat: -26.808168,
+      lng: -65.232903,
       hijos: [
         {
           nombre: "JEFATURA DEPARTAMENTAL",
@@ -756,6 +916,8 @@ const subjefatura = {
     },
     {
       nombre: "DEPARTAMENTO JUDICIAL (D-5) - Italia 2601", fijo: "", celular:  "3813681622",
+      lat: -26.809264,
+      lng: -65.233810,
       hijos: [
         {
           nombre: "JEFATURA DEPARTAMENTAL"
@@ -882,7 +1044,7 @@ const direcGenerales = {
           ]
         },
         {
-          nombre: "DIRECCIÓN POLICÍA CIENTÍFICA ESTE - Tornquist 15 - Lastenia",
+          nombre: "DIRECCIÓN POLICÍA CIENTÍFICA ESTE - República y Tornquinst - Lastenia",
           hijos: [
             {
               nombre: "DIVISIÓN CRIMINALÍSTICA ESTE",
@@ -943,7 +1105,9 @@ const direcGenerales = {
           ]
         },
         {
-          nombre: "DIRECCIÓN DE CABALLERÍA Y CANES (D.C.C.) - Av Jujuy 1400",
+          nombre: "DIRECCIÓN DE CABALLERÍA Y CANES (D.C.C.) - Av Jujuy 1449",
+          lat: -26.849648,
+          lng: -65.216363,
           hijos: [
             {
               nombre: "DIVISIÓN EQUINOS",
@@ -961,54 +1125,54 @@ const direcGenerales = {
           hijos: [
             {
               nombre: "DESTACAMENTO FRONTERIZO CABO JUAN C. VALLEJO (U.R.N) - RUTA 9 KM, 1371 - DPTO TRANCAS", 
-              celular: "3814426158"
+              celular: "3814426158", lat: -26.193860, lng: -65.218140
             },
             {
               nombre: "DESTACAMENTO FRONTERIZO EL TALA (U.R.E) - EX RUTA NAC 9, KM 17 - DPTO TRANCAS",
-              celular: "3815369129"
+              celular: "3815369129", lat: -26.123161, lng: -65.294442
             },
             {
               nombre: "DESTACAMENTO FRONTERIZO VALENTÍN JIMÉNEZ (U.R.E) - RUTA NAC 9, KM 1124 - LOS PUESTOS - DPTO LEALES",
-              celular: "3814426157"
+              celular: "3814426157", lat: -27.370978, lng: -64.953242
             },
             {
-              nombre: "DESTACAMENTO FRONTERIZO GDOR PIEDRABUENA (U.R.E) - EX RUTA NAC 34, KM 86 - GDOR PIEDRABUENA - DPTO BURRUYACÚ "
+              nombre: "DESTACAMENTO FRONTERIZO GDOR PIEDRABUENA (U.R.E) - EX RUTA NAC 34, KM 86 - GDOR PIEDRABUENA - DPTO BURRUYACÚ ", lat: -26.738451, lng: -64.647710
             },
             {
               nombre: "DESTACAMENTO FRONTERIZO 7 DE ABRIL (U.R.E) - RUTA NAC 34, KM 896 - 7 DE ABRIL - DPTO BURRUYACÚ",
-              celular: "3816060942"
+              celular: "3816060942", lat: -26.288290, lng: -64.496617
             },
             {
-              nombre: "DESTACAMENTO FRONTERIZO LAGUNA DE ROBLES (U.R.E) - RUTA PROV 304, KM 94 - LAGUNA DE ROBLES - DPTO BURRUYACÚ"
+              nombre: "DESTACAMENTO FRONTERIZO LAGUNA DE ROBLES (U.R.E) - RUTA PROV 304, KM 94 - LAGUNA DE ROBLES - DPTO BURRUYACÚ", lat: -26.255508, lng: -64.649814
             },
             {
               nombre: "DESTACAMENTO FRONTERIZO LAS CEJAS (U.R.E) - RUTA PROV 303, KM 47 - LAS CEJAS - DPTO CRUZ ALTA",
-              celular: "3816060927"
+              celular: "3816060927", lat: -26.887416, lng: -64.739404
             },
             {
               nombre: "DESTACAMENTO FRONTERIZO TACANAS (U.R.E) - RUTA PROV 302, KM 56 TACANAS - DPTO LEALES",
-              celular: "3814388147"
+              celular: "3814388147", lat: -27.140320, lng: -64.807071
             },
             {
-              nombre: "DESTACAMENTO FRONTERIZO COLALAO DEL VALLE (U.R.O) - RUTA NAC 40, KM 4308 - COLALAO DEL VALLE - DPTO TAFI DEL VALLE"
+              nombre: "DESTACAMENTO FRONTERIZO COLALAO DEL VALLE (U.R.O) - RUTA NAC 40, KM 4308 - DPTO TAFI DEL VALLE", lat: -26.351604, lng: -65.955755
             },
             {
-              nombre: "DESTACAMENTO FRONTERIZO ÁRBOLES GRANDES (U.R.S) - RUTA PROV 308, KM 5 - ARBOLES GRANDES - DPTO GRANEROS",
-              celular: "3814388048"
+              nombre: "DESTACAMENTO FRONTERIZO ÁRBOLES GRANDES (U.R.S) - RUTA PROV 308, KM 5 - ARBOLES GRANDES - DPTO GRANEROS", 
+              celular: "3814388048", lat: -27.685515, lng: -65.003691
             },
             {
               nombre: "DESTACAMENTO FRONTERIZO RÍO HUACRA (U.R.S) - RUTA NAC 38, KM 662 - RUMI PUNCO - DPTO LA COCHA ",
-              celular: "3814388097"
+              celular: "3814388097", lat: -28.003337, lng: -65.579892
             },
             {
               nombre: "DESTACAMENTO FRONTERIZO LOS MISTOLES (U.R.S) - RUTA NAC 157, KM 1128 - TACO RALO - DPTO GRANEROS ",
-              celular: "3814388150"
+              celular: "3814388150", lat: -27.909833, lng: -65.179304
             },
             {
-              nombre: "DESTACAMENTO FRONTERIZO LAS HIGUERAS (U.R.S) - RUTA PROV 308, KM 112 - LAS HIGUERAS - J.B.ALBERDI"
+              nombre: "DESTACAMENTO FRONTERIZO LAS HIGUERAS (U.R.S) - RUTA PROV 308, KM 112 - LAS HIGUERAS - J.B.ALBERDI", lat: -27.720006, lng: -65.794497
             },
             {
-              nombre: "DESTACAMENTO FRONTERIZO LAS BANDERITAS (U.R.S) - RUTA PROV 65, KM 20 - CAMINO A LAS ESTANCIAS - DPTO CHICLIGASTA"
+              nombre: "DESTACAMENTO FRONTERIZO LAS BANDERITAS (U.R.S) - RUTA PROV 65, KM 20 - CHICLIGASTA", lat: -27.331202, lng: -65.952103
             }
           ]
         }
@@ -1119,6 +1283,8 @@ const direcGenerales = {
     },
     {
       nombre: "DIRECCIÓN GENERAL DE DROGAS PELIGROSAS - Italia 2601 ",
+      lat: -26.808661, 
+      lng: -65.232643,
       hijos: [
         {
           nombre: "DIRECTOR GENERAL"
@@ -1132,17 +1298,17 @@ const direcGenerales = {
           ]
         },
         {
-          nombre: "DIDROP CAPITAL - Italia 2601",
+          nombre: "DIDROP CAPITAL - Italia 2601", 
           fijo: "03813185904",
-          celular: "3814426280"
+          celular: "3814426280", lat: -26.808661, lng: -65.232643
         },
         {
-          nombre: "DIDROP SUR - Calle Sarratea y Pje Linier - B° Alvear - Concepción",
+          nombre: "DIDROP SUR - Gral. José de San Martín 2461 - Concepción",
           fijo: "03865427235",
           celular: "3814426364"
         },
         {
-          nombre: "DIDROP ALBERDI - 25 de Mayo N° 289 - Juan B. Alberdi",
+          nombre: "DIDROP ALBERDI - 25 de Mayo y Bartolomé Mitre - Juan B. Alberdi",
           celular: "3812198240"
         },
         {
@@ -1151,20 +1317,20 @@ const direcGenerales = {
           celular: "3814388116"
         },
         {
-          nombre: "DIDROP BELLA VISTA - San Martin 1100 - B° Santa Rita - Bella Vista"
+          nombre: "DIDROP BELLA VISTA - San Martin 1100 - Bella Vista"
         },
         {
-          nombre: "DIDROP OESTE - Av Belgrano y 24 de Septiembre - Simoca",
+          nombre: "DIDROP OESTE - Belgrano 189 - Simoca",
           celular: "3814426067"
         },
         {
-          nombre: "DIDROP LULES - Italia y Libertad - Lules",
+          nombre: "DIDROP LULES - Italia y C.Libertad - Lules",
           fijo: "03812195743",
           celular: "3812199365"
         },
         {
-          nombre: "DIDROP NORTE - Av Solano y Obispo Colombres, B° Soeme - Las Talitas",
-          celular: "3816739114"
+          nombre: "DIDROP NORTE - Calle 21 y Av. Obispo Colombres - Bº SOEME - Las Talitas",
+          celular: "3816739114", lat: -26.778528, lng: -65.187533
         }
       ]
     },
@@ -1188,11 +1354,11 @@ const direcGenerales = {
           nombre: "DIRECCIÓN DE SEGURIDAD VIAL (D.S.V.)",
           hijos: [
             {
-              nombre: "DIVISIÓN DE SEGURIDAD VIAL NORTE - 9 de Julio entre Monteagudo y Uttinger - Tafí Viejo",
+              nombre: "DIVISIÓN DE SEGURIDAD VIAL NORTE - 9 de Julio 114 - Tafí Viejo",
               celular: "3815329068"
             },
             {
-              nombre: "DIVISIÓN DE SEGURIDAD VIAL SUR - Lamadrid y San Martín - Aguilares",
+              nombre: "DIVISIÓN DE SEGURIDAD VIAL SUR - José Mármol 1550 - Aguilares",
               celular: "3814426235"
             },
             {
@@ -1200,8 +1366,8 @@ const direcGenerales = {
               celular: "3814426000"
             },
             {
-              nombre: "DIVISIÓN DE SEGURIDAD VIAL OESTE - Calle Neuquén entre Pje Salta y Pje Juan Cruz - Lules",
-              celular: "3816075892"
+              nombre: "DIVISIÓN DE SEGURIDAD VIAL OESTE - Neuquén y Pje Juan Cruz - Lules",
+              celular: "3816075892",  lat: -26.941400, lng: -65.343257
             }
           ]
         }
@@ -1260,7 +1426,7 @@ const direcGenerales = {
               celular: "3816739498"
             },
             {
-              nombre: "DIV. VISUALIZACIÓN Y MONITOREO MONTEROS - 25 de Mayo 261",
+              nombre: "DIV. VISUALIZACIÓN Y MONITOREO MONTEROS - 25 de Mayo 261 - Monteros",
               fijo: "03863427165",
               celular: "3816721787"
             },
@@ -1270,16 +1436,16 @@ const direcGenerales = {
               celular: "3814388068"
             },
             {
-              nombre: "DIV. VISUALIZACIÓN Y MONITOREO TAFÍ VIEJO - Av Manuel Raya y Av Carbajal - Sector 11 - Bº Lomas de Tafí",
+              nombre: "DIV. VISUALIZACIÓN Y MONITOREO TAFÍ VIEJO - Av Manuel Raya y Av Carbajal - Bº Lomas de Tafí",
               celular: "3816061147"
             },
             {
               nombre: "DIV. VISUALIZACIÓN Y MONITOREO SAN JAVIER - Ruta 340 km 23",
-              celular: "3816721501"
+              celular: "3816721501", lat: -26.799901, lng: -65.360436
             },
             {
               nombre: "DIV. VISUALIZACIÓN Y MONITOREO EL CADILLAL - Ruta 347 km 5 y 1/2",
-              celular: "3816721790"
+              celular: "3816721790", lat: -26.623107, lng: -65.200622
             },
             {
               nombre: "DIV. VISUALIZACIÓN Y MONITOREO LAS TALITAS - Calle 18 y Calle 23 – Villa Mariano Moreno",
@@ -1309,45 +1475,45 @@ const direcGenerales = {
               celular: "3816082098"
             },
             {
-              nombre: "DIVISIÓN MOTORIZADA TAFÍ VIEJO - Av Jaldo y Calle Ceibo - Bº Lomas de Tafí",
+              nombre: "DIVISIÓN MOTORIZADA TAFÍ VIEJO - Av. Francisco Jaldo y Los Ceibos - Bº Lomas de Tafí",
               celular: "3816060500"
             },
             {
               nombre: "DIV. PATRULLEROS, MOTORIZADA Y URBANA DE LAS TALITAS - Plaza Barrio BGH - Villa Mariano Moreno",
               fijo: "03814376905",
-              celular: "3816060482"
+              celular: "3816060482", lat: -26.784445, lng: -65.204207
             },
             {
-              nombre: "DIVISIÓN MOTORIZADA Y PATRULLEROS YERBA BUENA - Gral José de San Martín 250",
+              nombre: "DIVISIÓN MOTORIZADA Y PATRULLEROS YERBA BUENA - Gral José de San Martín 250 - Yerba Buena",
               fijo: "03814257060",
               celular: "3816060281"
             },
             {
               nombre: "DIVISIÓN MOTORIZADA BANDA DEL RÍO SALÍ - Av San Martin km 1288 - Predio San Juan",
-              celular: "3816061043"
+              celular: "3816061043", lat: -26.850632, lng: -65.164928
             },
             {
               nombre: "DIVISIÓN MOTORIZADA BELLA VISTA - Manuel García Fernández y Av San Martin",
               celular: "3816721910"
             },
             {
-              nombre: "DIVISIÓN MOTORIZADA DELFÍN GALLO - La Principal s/nº",
-              celular: "3816064256"
+              nombre: "DIVISIÓN MOTORIZADA DELFÍN GALLO - Av Santiago Gallo s/nº",
+              celular: "3816064256", lat: -26.844688, lng: -65.092923
             },
             {
               nombre: "DIVISIÓN MOTORIZADA ALDERETES - Chacho Peñaloza 1535",
               celular: "3816061129"
             },
             {
-              nombre: "DIVISIÓN MOTORIZADA FAMAILLÁ - Sarmiento 295",
+              nombre: "DIVISIÓN MOTORIZADA FAMAILLÁ - Sarmiento 295 - Famaillá",
               celular: "38163522573"
             },
             {
               nombre: "DIVISIÓN MOTORIZADA LULES - 12 de Octubre y Pje Sin nombre",
-              celular: "3812224134"
+              celular: "3812224134", lat: -26.928492, lng: -65.331790
             },
             {
-              nombre: "DIVISIÓN MOTORIZADA Y URBANA DE MONTEROS - 24 de Septiembre 311",
+              nombre: "DIVISIÓN MOTORIZADA Y URBANA DE MONTEROS - 24 de Septiembre 311 - Monteros",
               celular: "38163528613"
             },
             {
@@ -1359,7 +1525,7 @@ const direcGenerales = {
               celular: "3865358208"
             },
             {
-              nombre: "DIV. PATRULLEROS, MOTORIZADA Y URBANA DE CONCEPCIÓN - 9 de Julio 40",
+              nombre: "DIV. PATRULLEROS, MOTORIZADA Y URBANA DE CONCEPCIÓN - 9 de Julio 40 - Concepcion",
               celular: "3865358200"
             }
           ]
@@ -1387,8 +1553,8 @@ const direcGenerales = {
               celular: "3815320017"
             },
             {
-              nombre: "V DISTRITO URBANO - Bº Manantial Sur",
-              celular: "3815321320"
+              nombre: "V DISTRITO URBANO - Av Manantial Sur y Coronel Zelaya",
+              celular: "3815321320", lat: -26.864390, lng: -65.249637
             },
             {
               nombre: "VI DISTRITO URBANO - Moreno 1889",
@@ -1396,12 +1562,12 @@ const direcGenerales = {
               celular: "3816721494"
             },
             {
-              nombre: "X DISTRITO URBANO - Av Aconquija y Roca - Yerba Buena",
+              nombre: "X DISTRITO URBANO - Av Aconquija y Julio Argentino Roca - Yerba Buena",
               celular: "3815369436"
             },
             {
               nombre: "PROGRAMA INTEGRACIÓN BARRIAL COSTANERA - Estados Unidos 1500",
-              celular: "3814426064"
+              celular: "3814426064", lat: -26.827499, lng: -65.171603
             }
           ]
         }
@@ -1494,15 +1660,15 @@ const direcGenerales = {
               ]
             },
             {
-              nombre: "DESTACAMENTO EL CADILLAL"
+              nombre: "DESTACAMENTO EL CADILLAL", lat: -26.624525, lng: -65.201190
             },
             {
-              nombre: "DESTACAMENTO LA ANGOSTURA"
+              nombre: "DESTACAMENTO LA ANGOSTURA", 
             }
           ]
         },
         {
-          nombre: "SUB UNIDAD DE BOMBEROS CONCEPCIÓN - San Martín 2442 - Concepción",
+          nombre: "SUB UNIDAD DE BOMBEROS CONCEPCIÓN - San Martín 2448 - Concepción",
           fijo: "03865424389",
           celular: "3814388171",
           hijos: [
@@ -1550,6 +1716,8 @@ const direcGenerales = {
     },
     {
       nombre: "DIRECCIÓN GENERAL DE FUERZAS ESPECIALES - Italia 2601",
+      lat: -26.806339, 
+      lng: -65.232809,
       hijos: [
         {
           nombre: "DIRECTOR GENERAL",
@@ -1565,7 +1733,7 @@ const direcGenerales = {
         {
           nombre: "DIRECCIÓN FUERZAS ESPECIALES – C.E.R.O.",
           fijo: "03813183975",
-          celular: "3816061281",
+          celular: "3816061281", 
           hijos: [
             {
               nombre: "GRUPO OPERACIONES ESPECIALES (G.O.E)"
@@ -1658,10 +1826,10 @@ const direcGenerales = {
               nombre: "COORDINADOR DE ZONA"
             },
             {
-              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 6 - CAPITAL - Gdor. Javier Lopez 163 - Las Talitas"
+              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 6 - CAPITAL - Gdor. Javier Lopez 163 - Las Talitas",  lat: -26.787309, lng: -65.206865
             },
             {
-              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 4 - TAPIA - Ruta Nac 9 km 1321"
+              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 4 - Ruta Nac 9 km 1321 - Tapia"
             }
           ]
         },
@@ -1672,10 +1840,10 @@ const direcGenerales = {
               nombre: "COORDINADOR DE ZONA"
             },
             {
-              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 5 - SIMOCA - Pje San Miguel s/nº"
+              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 5 - Pje San Miguel s/nº - Simoca"
             },
             {
-              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 3 - GRANEROS - San Martin y Moreno"
+              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 3 - San Martin y Moreno - Graneros"
             }
           ]
         },
@@ -1686,7 +1854,7 @@ const direcGenerales = {
               nombre: "COORDINADOR DE ZONA"
             },
             {
-              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 1 - BURRUYACÚ - Pje Alfredo Bullot y San lorenzo"
+              nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 1 - BURRUYACÚ - Pje. Boullhesen y San lorenzo"
             },
             {
               nombre: "DIVISIÓN DELITOS RURALES Y AMBIENTALES Nº 2 - LEALES - Ernesto E Padilla y Ricardo Bascary - Villa de Leales"
@@ -1723,7 +1891,7 @@ const direcGenerales = {
           fijo: "03813185164"
         },
         {
-          nombre: "DIRECCIÓN DE JARDÍN MATERNO INFANTIL POLLITOS AZULES"
+          nombre: "DIRECCIÓN DE JARDÍN MATERNO INFANTIL POLLITOS AZULES", lat: -26.808762, lng: -65.232300
         },
         {
           nombre: "GABINETE INTERDISCIPLINARIO DE ASESORAMIENTO MÉDICO, LEGAL Y PSICOPEDAGÓGICO"
@@ -1759,13 +1927,13 @@ const direcGenerales = {
           ]
         },
         {
-          nombre: "DIRECCIÓN SEGURIDAD CENTRO JUDICIAL MONTEROS - Crisóstomo Álvarez 370"
+          nombre: "DIRECCIÓN SEGURIDAD CENTRO JUDICIAL MONTEROS - Crisóstomo Álvarez 370 - Monteros"
         },
         {
-          nombre: "DIRECCIÓN SEGURIDAD CENTRO JUDICIAL ESTE - Diag Alberto Paz 227 - Banda del Rio Salí"
+          nombre: "DIRECCIÓN SEGURIDAD CENTRO JUDICIAL ESTE - Diag Alberto Paz 227 - Banda del Rio Salí", lat: -26.837088, lng: -65.162930
         },
         {
-          nombre: "DIRECCIÓN SEGURIDAD CENTRO JUDICIAL CONCEPCIÓN - España 1438"
+          nombre: "DIRECCIÓN SEGURIDAD CENTRO JUDICIAL CONCEPCIÓN - España 1434 - Concepción"
         }
       ]
     },
@@ -1856,7 +2024,7 @@ const direcGenerales = {
       ]
     },
     {
-      nombre: "DIRECCIÓN DE COORDINACIÓN DEPORTIVA Y SOCIAL - Av Pedro Miguel Aráoz 325",
+      nombre: "DIRECCIÓN DE COORDINACIÓN DEPORTIVA Y SOCIAL - Av Pedro Miguel Aráoz 342",
       celular: "3812201977",
       hijos: [
         {
@@ -1922,21 +2090,23 @@ const regionales = {
           nombre: "ZONA 1 - San Martin 224",
           fijo: "03814522430",
           celular: "3814426148",
+          lat: -26.830684,
+          lng: -65.200428,
           hijos: [
             {
               nombre: "COMISARÍA 1º - San Martin 224",
               fijo: "03814222550",
-              celular: "3814426313"
+              celular: "3814426313", lat: -26.830684, lng: -65.200428
             },
             {
               nombre: "COMISARÍA 2º - Buenos Aires 479",
               fijo: "03814248006",
-              celular: "3814426283"
+              celular: "3814426283", lat: -26.836853, lng: -65.208028
             },
             {
               nombre: "BRIGADA FEMENINA - Buenos Aires 479",
               fijo: "03814248069",
-              celular: "3816069883"
+              celular: "3816069883", lat: -26.836853, lng: -65.208028
             },
             {
               nombre: "DESTACAMENTO BANCO RESIDUAL - San Martin 362"
@@ -1972,30 +2142,32 @@ const regionales = {
           nombre: "ZONA 2 - Muñecas 1658",
           fijo: "03814347924",
           celular: "3816716116",
+          lat: -26.807719,
+          lng: -65.200988,
           hijos: [
             {
               nombre: "COMISARÍA 5º - Muñecas 1658",
               fijo: "03814273810",
-              celular: "3814426241"
+              celular: "3814426241", lat: -26.807719, lng: -65.200988
             },
             {
               nombre: "COMISARÍA 6º - España 1715",
               fijo: "03814320558",
-              celular: "3814426301"
+              celular: "3814426301", lat: -26.813445, lng: -65.219463
             },
             {
               nombre: "COMISARÍA 10º - Blas Parera 800",
-              celular: "3814426268"
+              celular: "3814426268", lat: -26.814303, lng: -65.180403
             },
             {
               nombre: "COMISARÍA 12º - Felix de Olazabal 1520",
               fijo: "03814347787",
-              celular: "3814426295"
+              celular: "3814426295", lat: -26.800887, lng: -65.249830
             },
             {
               nombre: "COMISARÍA 14º - Manual Estrada 2700",
               fijo: "03814341256",
-              celular: "3814426260"
+              celular: "3814426260", lat: -26.795972, lng: -65.230774
             },
             {
               nombre: "DESTACAMENTO CENTRO DE ADM. Y DERIVACIÓN DE MENORES - Italia 2601 "
@@ -2015,29 +2187,31 @@ const regionales = {
           ]
         },
         {
-          nombre: "ZONA 3 - Pje 20 de Junio 363",
+          nombre: "ZONA 3 - Pje 20 de Junio 366",
           fijo: "03814510022",
           celular: "3814426274",
+          lat: -26.855481,
+          lng: -65.197021,
           hijos: [
             {
               nombre: "COMISARÍA 4º - Eugenio Mendez 369",
               fijo: "03814526200",
-              celular: "3814426335"
+              celular: "3814426335", lat: -26.850927, lng: -65.197982
             },
             {
               nombre: "COMISARÍA 9º - Ayacucho 2799",
               fijo: "03814295121",
-              celular: "3814426251"
+              celular: "3814426251", lat: -26.866812, lng: -65.218141
             },
             {
               nombre: "COMISARÍA 11º - Av Benjamín Aráoz 1095",
               fijo: "03814310337",
-              celular: "3814426307"
+              celular: "3814426307", lat: -26.835848, lng: -65.181202
             },
             {
               nombre: "COMISARÍA 13º - Magallanes 1390",
               fijo: "03814366670",
-              celular: "3814426189"
+              celular: "3814426189", lat: -26.856700, lng: -65.224880
             },
             {
               nombre: "DESTACAMENTO FALIVENE - Dr René Favaloro 768",
@@ -2052,27 +2226,29 @@ const regionales = {
           ]
         },
         {
-          nombre: "ZONA 4 - H Descole y A Lincoln",
+          nombre: "ZONA 4 - Av. Colon y Av. Perez Palavecino",
           celular: "3812181504",
+          lat: -26.868089,
+          lng: -65.243698,
           hijos: [
             {
               nombre: "COMISARÍA 3º - Lamadrid 2556",
               fijo: "03814330439",
-              celular: "3814426141"
+              celular: "3814426141", lat: -26.831123, lng: -65.238109
             },
             {
               nombre: "COMISARÍA 7º - Don Bosco 2601",
               fijo: "03814330573",
-              celular: "3816739117"
+              celular: "3816739117", lat: -26.819584, lng: -65.235859
             },
             {
               nombre: "COMISARÍA 8º - Alsina 4700",
               fijo: "03814392541",
-              celular: "3814426303"
+              celular: "3814426303", lat: -26.835004, lng: -65.268009
             },
             {
               nombre: "COMISARÍA 15º - Av Coronel Zelaya 4000",
-              celular: "3816721916"
+              celular: "3816721916", lat: -26.868397, lng: -65.250246
             },
             {
               nombre: "DESTACAMENTO MATERNIDAD - Av Mate de Luna 1535"
@@ -2082,9 +2258,11 @@ const regionales = {
       ]
     },
     {
-      nombre: "UNIDAD REGIONAL ESTE (U.R.E) - Tornquist 15 - Lastenia",
+      nombre: "UNIDAD REGIONAL ESTE (U.R.E) - República y Tornquist - Lastenia",
       fijo: "03814260528",
       celular: "3814426144",
+      lat: -26.859784,
+      lng: -65.152719,
       hijos: [
         {
           nombre: "JEFE DE REGIONAL",
@@ -2117,227 +2295,233 @@ const regionales = {
         {
           nombre: "ZONA 1 - Ruta 317 Km 7 y 1/2 - La Ramada de Abajo- Burruyacú",
           celular: "3814388028",
+          lat: -26.721998,
+          lng: -64.908647,
           hijos: [
             {
-              nombre: "COMISARÍA 7 DE ABRIL - Calle Sin Nombre "
+              nombre: "COMISARÍA 7 DE ABRIL - Calle Sin Nombre ", lat: -26.288503, lng: -64.500859
             },
             {
               nombre: "COMISARÍA BURRUYACÚ - Av Libertador 542",
               fijo: "03894421004",
-              celular: "3814388130"
+              celular: "3814388130", lat: -26.501267, lng: -64.741037
             },
             {
               nombre: "COMISARÍA EL CAJÓN - Ruta 310 Km 8",
-              celular: "3814426333"
+              celular: "3814426333", lat: -26.504687, lng: -64.876410
             },
             {
               nombre: "COMISARÍA CHILCAS - Ruta 304 - Chilcas",
-              celular: "38166716137"
+              celular: "38166716137", lat: -26.380676, lng: -64.684324
             },
             {
               nombre: "COMISARÍA EL CHAÑAR - Dr Fautino Sarmiento, Manz 13 Lote 257",
               fijo: "03814892019",
-              celular: "3814388035"
+              celular: "3814388035", lat: -26.757864, lng: -65.068632
             },
             {
               nombre: "COMISARÍA EL NARANJO - Ruta 316 Km 11",
-              celular: "3816426374"
+              celular: "3816426374", lat: -26.646012, lng: -65.049089
             },
             {
               nombre: "COMISARÍA EL PUESTITO - Calle Sin Nombre - El Puestito",
-              celular: "3814426246"
+              celular: "3814426246", lat: -26.434683, lng: -64.752284
             },
             {
               nombre: "COMISARÍA EL TIMBÓ - Ruta 305 Km 21 - El Timbo Viejo",
               fijo: "03814311120",
-              celular: "3814388085"
+              celular: "3814388085", lat: -26.679010, lng: -65.135879
             },
             {
               nombre: "COMISARÍA GARMENDIA - Aurelio Boullot y 9 Julio",
-              celular: "3814388143"
+              celular: "3814388143", lat: -26.570238, lng: -64.559351
             },
             {
               nombre: "COMISARÍA LA RAMADA - 9 Julio 1",
               fijo: "03814924018",
-              celular: "3816064297"
+              celular: "3816064297", lat: -26.688412, lng: -64.946558
             },
             {
               nombre: "COMISARÍA GDOR. PIEDRABUENA - Ruta 345 y Ex Ruta Nac 34",
-              celular: "3816716152"
+              celular: "3816716152", lat: -26.738451, lng: -64.647710
             },
             {
               nombre: "COMISARÍA VILLA BENJAMÍN ARÁOZ - Ruta 304 Km 56",
               fijo: "0389421893",
-              celular: "3816064299"
+              celular: "3816064299", lat: -26.556345, lng: -64.801898
             },
             {
-              nombre: "COMISARÍA VILLA PADRE MONTI - Ruta 305 Km 49"
+              nombre: "COMISARÍA VILLA PADRE MONTI - Ruta 305 Km 49", lat: -26.510073, lng: -64.994414
             }
           ]
         },
         {
-          nombre: "ZONA 2 - Av Santo Cristo 302 - B.R.Sali",
+          nombre: "ZONA 2 - Av Santo Cristo 302 - Banda del Rio Sali",
           celular: "3814426209",
+          lat: -26.844301,  
+          lng: -65.159241,
           hijos: [
             {
               nombre: "COMISARÍA ALDERETES - Av Urquiza y Obispo Colombres",
               fijo: "03814940408",
-              celular: "3814426099"
+              celular: "3814426099", lat: -26.819406, lng: -65.143586
             },
             {
               nombre: "COMISARÍA BANDA DEL RÍO SALÍ - Av Santo Cristo y Las Heras ",
               fijo: "03814263750",
-              celular: "3816064140"
+              celular: "3816064140", lat: -26.844301, lng: -65.159241
             },
             {
               nombre: "COMISARÍA COLOMBRES - Av San Martín s/nº",
               fijo: "03814916004",
-              celular: "3814426344"
+              celular: "3814426344", lat: -26.896514, lng: -65.102874
             },
             {
               nombre: "COMISARÍA DELFÍN GALLO - La Principal s/nº",
               fijo: "03814891528",
-              celular: "3816716097"
+              celular: "3816716097", lat: -26.844251, lng: -65.094006
             },
             {
               nombre: "COMISARÍA EL BRACHO - Calle Principal y Calle 3",
-              celular: "3816064289"
+              celular: "3816064289", lat: -26.990513, lng: -65.182159
             },
             {
               nombre: "COMISARÍA LA FLORIDA - Av Hipolito Irigoyen y Candelaria",
               fijo: "03814922015",
-              celular: "3814426264"
+              celular: "3814426264", lat: -26.819581, lng: -65.094632
             },
             {
               nombre: "COMISARÍA LAS CEJAS - 25 de Mayo s/nº",
-              celular: "3814388174"
+              celular: "3814388174", lat: -26.889109, lng: -64.741597
             },
             {
               nombre: "COMISARÍA LASTENIA - Republica y Tornquist",
               fijo: "03814266390",
-              celular: "3816061331"
+              celular: "3816061331", lat: -26.859784, lng: -65.152719
             },
             {
               nombre: "COMISARÍA LOS BULACIOS - Ruta Prov 306 km 16",
-              celular: "3816069847"
+              celular: "3816069847", lat: -26.982598, lng: -65.217977
             },
             {
               nombre: "COMISARÍA LOS RALOS - Av Gral Güemes y Perito Moreno",
               fijo: "03869491012",
-              celular: "3814426377"
+              celular: "3814426377", lat: -26.888591, lng: -65.006447
             },
             {
               nombre: "COMISARÍA POZO DEL ALTO - Calle Sin Nombre - Est Pacará",
-              celular: "3816064306"
+              celular: "3816064306", lat: -26.899291, lng: -65.146906
             },
             {
               nombre: "COMISARÍA RANCHILLOS - Bartolomé Mitre 50",
               fijo: "03869421011",
-              celular: "3814426058"
+              celular: "3814426058", lat: -26.952807, lng: -65.048678
             },
             {
               nombre: "COMISARÍA SAN ANDRÉS - Av San Martin 50",
               fijo: "03814915324",
-              celular: "3814426216"
+              celular: "3814426216", lat: -26.892500, lng: -65.193910
             },
             {
               nombre: "CRÍA. GRAL. GÜEMES - Juan Pablo II s/nº",
               fijo: "03814269820",
-              celular: "3814426229"
+              celular: "3814426229", lat: -26.831094, lng: -65.167864
             },
             {
-              nombre: "DESTACAMENTO EL NARANJITO - La Favorina"
+              nombre: "DESTACAMENTO EL NARANJITO - La Favorina", lat: -26.982981, lng: -65.037351
             },
             {
-              nombre: "DESTACAMENTO HOSPITAL DEL ESTE - Congreso y Camino del Carmen - B.R.Sali"
+              nombre: "DESTACAMENTO HOSPITAL DEL ESTE - Congreso y Camino del Carmen - B.R.Sali", lat: -26.852538, lng: -65.165212
             },
             {
-              nombre: "DESTACAMENTO LOS PEREYRA - Ruta Prov 327 km 99"
+              nombre: "DESTACAMENTO LOS PEREYRA - Ruta Prov 327 km 99", lat: -26.978680, lng: -64.893925
             },
             {
               nombre: "DESTACAMENTO SOLDADO TUCUMANO - Perú y H Rodriguez",
               fijo: "03814266527",
-              celular: "3814426019"
+              celular: "3814426019", lat: -26.849193, lng: -65.174927
             }
           ]
         },
         {
           nombre: "ZONA 3 - Ernesto E Padilla y Santa Rosa de Lima ",
           celular: "3814426035",
+          lat: -27.137305, 
+          lng: -65.261401,
           hijos: [
             {
               nombre: "COMISARÍA AGUA DULCE - Camino Rural - Orán - Leales",
-              celular: "3816716197"
+              celular: "3816716197", lat: -27.074588, lng: -65.036155
             },
             {
               nombre: "COMISARÍA BELLA VISTA - Av Fernando Riera 300",
               fijo: "03814820038",
-              celular: "3814426195"
+              celular: "3814426195", lat: -27.033129, lng: -65.304131
             },
             {
-              nombre: "COMISARÍA CAMPO QUIMIL - Sin Nombre - Campo Quimil - Leales"
+              nombre: "COMISARÍA CAMPO QUIMIL - Sin Nombre - Campo Quimil - Leales", lat: -27.257183, lng: -64.854241
             },
             {
               nombre: "COMISARÍA ESTACIÓN ARAOZ - Ruta Prov 327 y Calle Sin Nombre",
-              celular: "3814426124"
+              celular: "3814426124", lat: -27.055775, lng: -64.919911
             },
             {
               nombre: "COMISARÍA ESQUINA - Camino Vecinal - Esquina",
-              celular: "3816069878"
+              celular: "3816069878", lat: -27.027312, lng: -65.194324
             },
             {
               nombre: "COMISARÍA INGENIO LEALES - 24 Septiembnre 900",
               fijo: "03863490885",
-              celular: "3816064199"
+              celular: "3816064199", lat: -27.068820, lng: -65.229580
             },
             {
               nombre: "COMISARÍA LOS GÓMEZ - Calle Sin Nombre - Los Gomez - Leales",
-              celular: "3816069891"
+              celular: "3816069891", lat: -27.324054, lng: -65.210466
             },
             {
               nombre: "COMISARÍA LOS HERRERA - Calle Sin Nombre - Los Herrera - Leales ",
-              celular: "3816716176"
+              celular: "3816716176", lat: -27.413380, lng: -65.080593
             },
             {
               nombre: "COMISARÍA LOS PUESTOS - Ruta 9 - Km 1222",
               fijo: "03863497999",
-              celular: "3816064294"
+              celular: "3816064294", lat: -27.281250, lng: -65.018317
             },
             {
               nombre: "COMISARÍA LOS SUELDOS - Calle Sin Nombre - Los Sueldo - Leales",
-              celular: "3815311648"
+              celular: "3815311648", lat: -27.091269, lng: -65.260414
             },
             {
               nombre: "COMISARÍA MANCOPA - Calle Sin Nombre - Mancopa - Leales",
-              celular: "3816064217"
+              celular: "3816064217", lat: -27.029743, lng: -65.150982
             },
             {
               nombre: "COMISARÍA MOJÓN - Ruta Prov 327 km 72",
-              celular: "3816721905"
+              celular: "3816721905", lat: -27.209443, lng: -64.930412
             },
             {
               nombre: "COMISARÍA QUILMES - Calle Sin Nombre - Quilmes - Leales",
               fijo: "03869496000",
-              celular: "3814388022"
+              celular: "3814388022", lat: -27.059295, lng: -65.218007
             },
             {
               nombre: "COMISARÍA RÍO COLORADO - Ituzaigo y Alberdi",
               fijo: "03863491064",
-              celular: "3816716110"
+              celular: "3816716110", lat: -27.150031, lng: -65.356973
             },
             {
               nombre: "COMISARÍA ROMERA POZO - Calle Sin Nombre - Romera Pozo - Leales",
-              celular: "3815324122"
+              celular: "3815324122", lat: -27.108711, lng: -65.184948
             },
             {
-              nombre: "COMISARÍA SANTA ROSA - Av. Santa Rosa Lima s/nº",
+              nombre: "COMISARÍA SANTA ROSA DE LEALES - Santa Rosa Lima y Dr ERnesto Padilla",
               fijo: "03863493041",
-              celular: "3814426350"
+              celular: "3814426350", lat: -27.137305, lng: -65.261401
             },
             {
               nombre: "COMISARÍA VILLA DE LEALES - Ernesto E Padilla y Ricardo Bascary ",
               fijo: "03863497027",
-              celular: "3816077341"
+              celular: "3816077341", lat: -27.194337, lng: -65.309544
             }
           ]
         }
@@ -2386,64 +2570,68 @@ const regionales = {
         {
           nombre: "ZONA 1 - Av Los Faroles - Tafí del Valle",
           celular: "3814388177",
+          lat: -26.852544,
+          lng: -65.710620,
           hijos: [
             {
               nombre: "COMISARÍA TAFÍ DEL VALLE - Av San Martin y Ruta Prov 307",
               fijo: "03867421322",
-              celular: "3814426346"
+              celular: "3814426346", lat: -26.842879, lng: -65.709580
             },
             {
               nombre: "COMISARÍA EL MOLLAR - Los Menhires y C Nina Ortega Manguini",
               fijo: "03867491128",
-              celular: "3815371005"
+              celular: "3815371005", lat: -26.939771, lng: -65.702592
             },
             {
               nombre: "COMISARÍA AMAICHA DEL VALLE - Ernesto Padilla y San Martin",
               fijo: "03892421141",
-              celular: "3814426130"
+              celular: "3814426130", lat: -26.593151, lng: -65.919413
             },
             {
               nombre: "COMISARÍA COLALAO DEL VALLE - Av El Tajamar y Calle Sin Nombre",
-              celular: "3814426197"
+              celular: "3814426197", lat: -26.362029, lng: -65.956471
             }
           ]
         },
         {
           nombre: "ZONA 2 - Juan Luis Nougues 144 - San Isidro de Lules",
           celular: "3814388172",
+          lat: -26.852737,
+          lng: -65.709977,
           hijos: [
             {
               nombre: "COMISARÍA EL MANANTIAL - 25 de Mayo 200",
               fijo: "03814390111",
-              celular: "3812237417"
+              celular: "3812237417", lat: -26.848313, lng: -65.282809
             },
             {
               nombre: "COMISARÍA FAMAILLÁ - Sarmiento 295",
               fijo: "03863461130",
-              celular: "3814426036"
+              celular: "3814426036", lat: -27.054543, lng: -65.403106
             },
             {
               nombre: "COMISARÍA LA REDUCCIÓN - Av Pres Perón y Ruta 301",
               fijo: "03814913194",
-              celular: "3814426236"
+              celular: "3814426236", lat: -26.958477, lng: -65.350664
             },
             {
               nombre: "COMISARÍA LOS AGUIRRE - Ruta Nac 157 km 1246",
-              celular: "3814426398"
+              celular: "3814426398", lat: -26.907678, lng: -65.233350
             },
             {
               nombre: "COMISARÍA LULES - C. J L Nougues 115",
               fijo: "03814811111",
-              celular: "3814426102"
+              celular: "3814426102", lat: -26.921381, lng: -65.337089
             },
             {
               nombre: "COMISARÍA SAN PABLO - Av San Martin y 20 de Junio",
               fijo: "03814917116",
-              celular: "3814426250"
+              celular: "3814426250", lat: -26.871500, lng: -65.311866
             },
             {
               nombre: "COMISARÍA VILLA NOUGUÉS - Ruta Prov 338",
-              celular: "3816061177"
+              celular: "3816061177", lat: -26.857202, lng: -65.380995
             }
           ]
         },
@@ -2454,50 +2642,50 @@ const regionales = {
             {
               nombre: "COMISARÍA SANTA LUCÍA - Av Libertador y Juan Jose Castelli",
               fijo: "03863498025",
-              celular: "3816064195"
+              celular: "3816064195", lat: -27.094036, lng: -65.533338
             },
             {
               nombre: "COMISARÍA ACHERAL - San Martin 290",
               fijo: "03863496012",
-              celular: "3816069854"
+              celular: "3816069854", lat: -27.120188, lng: -65.472028
             },
             {
               nombre: "COMISARÍA AMBERES - Camino Vecinal - Amberes - Monteros",
-              celular: "3816075136"
+              celular: "3816075136", lat: -27.266393, lng: -65.489448
             },
             {
               nombre: "COMISARÍA CAP. CÁCERES - Tte Azúa s/nº",
-              celular: "3816075903"
+              celular: "3816075903", lat: -27.190700, lng: -65.605109
             },
             {
               nombre: "COMISARÍA LEÓN ROUGES - Ruta 38 y Sgto Rosario",
-              celular: "3816060383"
+              celular: "3816060383", lat: -27.219390, lng: -65.525156
             },
             {
               nombre: "COMISARÍA LOS SOSA - Heroes de Manchala y Sgto Moya ",
-              celular: "3816036497"
+              celular: "3816036497", lat: -27.144711, lng: -65.566099
             },
             {
               nombre: "COMISARÍA MONTEROS - 24 Septiembre 121",
               fijo: "03863428927",
-              celular: "3814426174"
+              celular: "3814426174", lat: -27.164994, lng: -65.496315
             },
             {
               nombre: "COMISARÍA RÍO SECO - Av Himno Patrio y Fray Leopoldo Roldan",
               fijo: "03863471081",
-              celular: "3815202962"
+              celular: "3815202962", lat: -27.265579, lng: -65.549071
             },
             {
               nombre: "COMISARÍA SARGENTO MOYA - Cap Romano s/nº ",
-              celular: "3816064150"
+              celular: "3816064150", lat: -27.227975, lng: -65.661538
             },
             {
-              nombre: "COMISARÍA TTE. BERDINA - Tte Barcelo 130"
+              nombre: "COMISARÍA TTE. BERDINA - Tte Barcelo 130", lat: -27.051058, lng: -65.486573
             },
             {
               nombre: "COMISARÍA VILLA QUINTEROS - Jardin de la Republica y Av Independencia",
               fijo: "03863471014",
-              celular: "3816064174"
+              celular: "3816064174", lat: -27.254163, lng: -65.550556
             },
             {
               nombre: "COMISARÍA SOLDADO MALDONADO"
@@ -2543,82 +2731,86 @@ const regionales = {
           ]
         },
         {
-          nombre: "ZONA 1 - 9 de Julio y Av Irigoyen - Trancas",
+          nombre: "ZONA 1 - Av Hipólito Irigoyen 599 - Trancas",
           fijo: "03862421111",
           celular: "3816738627",
+          lat: -26.230273,
+          lng: -65.282389,
           hijos: [
             {
               nombre: "COMISARÍA CHOROMORO - Adolfina de Poliche y Napoleón Ballespin",
-              celular: "3816069851"
+              celular: "3816069851", lat: -26.411386, lng: -65.317463
             },
             {
               nombre: "COMISARÍA CHUSCHA - Calle Sin Nombre - La higuera - Trancas",
-              celular: "3814426041"
+              celular: "3814426041", lat: -26.387582, lng: -65.464040
             },
             {
               nombre: "COMISARÍA San Pedro de COLALAO - 24 de Setiembre - 2ª Cuadra",
               fijo: "03862481018",
-              celular: "3814426140"
+              celular: "3814426140", lat: -26.233275, lng: -65.495318
             },
             {
               nombre: "COMISARÍA TRANCAS - Av Hipólito Irigoyen 599",
               fijo: "03862421111",
-              celular: "3814388140"
+              celular: "3814388140", lat: -26.230273, lng: -65.282389
             },
             {
-              nombre: "COMISARÍA VIPOS - Ruta 9 Km 1336",
-              celular: "3816064264"
+              nombre: "COMISARÍA VIPOS - Ruta 9 Km 1336", 
+              celular: "3816064264", lat: -26.481196, lng: -65.317730
             },
             {
-              nombre: "SUB COMISARÍA TAPIA - Av Pedro F Riera s/nº"
+              nombre: "SUB COMISARÍA TAPIA - Av Pedro F Riera s/nº",  lat: -26.596814, lng: -65.278803
             },
             {
               nombre: "DESTACAMENTO BENJAMÍN PAZ - Ruta Nacional 9, en el kilómetro 1347",
               celular: "3814426105"
             },
             {
-              nombre: "DESTACAMENTO RÍO TALA - Ex Ruta Nac 9 - Trancas"
+              nombre: "DESTACAMENTO RÍO TALA - Ex Ruta Nac 9 - Trancas", lat: -26.123161, lng: -65.294442
             }
           ]
         },
         {
           nombre: "ZONA 2 - San Martin y Cariola - Yerba Buena",
           fijo: "03814251695",
+          lat: -26.816049,
+          lng: -65.291787,   
           hijos: [
             {
               nombre: "COMISARÍA EL CORTE - Ruta 338  km 13.5",
               fijo: "03814256255",
-              celular: "3814426308"
+              celular: "3814426308", lat: -26.806082, lng: -65.335213
             },
             {
               nombre: "COMISARÍA MARTÍCOLL - Av Alfredo Guzman y San Luis - Yerba Buena",
               fijo: "03814358000",
-              celular: "3816064283"
+              celular: "3816064283", lat: -26.829513, lng: -65.269183
             },
             {
               nombre: "COMISARÍA RACO - Ruta 341 Km 18 1/2 ",
               fijo: "03814925266",
-              celular: "3816064273"
+              celular: "3816064273", lat: -26.662970, lng: -65.405588
             },
             {
               nombre: "COMISARÍA SAN JOSÉ - Frias Silva 200",
               fijo: "03814347800",
-              celular: "3816064255"
+              celular: "3816064255", lat: -26.800365, lng: -65.261463
             },
             {
               nombre: "COMISARÍA VILLA CARMELA - Calle Los Lirios - Lote 22 Bº 80 Viv",
-              celular: "3812181507"
+              celular: "3812181507", lat: -26.770367, lng: -65.274138
             },
             {
               nombre: "COMISARÍA YERBA BUENA - San Marti­n 250",
               fijo: "03814251045",
-              celular: "3814426068"
+              celular: "3814426068", lat: -26.816049, lng: -65.291787
             },
             {
               nombre: "DESTACAMENTO ANCA JULI - Camino rural - Raco"
             },
             {
-              nombre: "DESTACAMENTO SAN JAVIER - Ruta Prov 340"
+              nombre: "DESTACAMENTO SAN JAVIER - Ruta Prov 340", lat: -26.799901, lng: -65.360436
             }
           ]
         },
@@ -2630,27 +2822,27 @@ const regionales = {
             {
               nombre: "COMISARÍA VILLA MARIANO MORENO - Calle 4 y 15 - Las Talitas",
               fijo: "03814371061",
-              celular: "3816069862"
+              celular: "3816069862", lat: -26.775230, lng: -65.209989
             },
             {
               nombre: "COMISARÍA EL CADILLAL - Ruta Prov 347 km 3",
               fijo: "03814923733",
-              celular: "3814426043"
+              celular: "3814426043", lat: -26.641535, lng: -65.213748
             },
             {
               nombre: "COMISARÍA EL COLMENAR - Williams Cross 3100",
               fijo: "03814273484",
-              celular: "3816069827"
+              celular: "3816069827", lat: -26.789740, lng: -65.190719
             },
             {
               nombre: "COMISARÍA LAS TALITAS - Barrio Grafico II",
               fijo: "03814371771",
-              celular: "3814426018"
+              celular: "3814426018", lat: -26.756436, lng: -65.196168
             },
             {
               nombre: "COMISARÍA LOS NOGALES - Ruta 9 km 1308",
               fijo: "03814921384",
-              celular: "3816069876"
+              celular: "3816069876", lat: -26.705706, lng: -65.222913
             }
           ]
         },
@@ -2660,22 +2852,22 @@ const regionales = {
             {
               nombre: "COMISARÍA TAFÍ VIEJO - 9 de Julio 197",
               fijo: "03814613648",
-              celular: "3814426181"
+              celular: "3814426181", lat: -26.732897, lng: -65.257240
             },
             {
               nombre: "COMISARÍA LOMAS DE TAFÍ - Armando Burgos y Contino - Sector 12",
               fijo: "03814611301",
-              celular: "3816061219"
+              celular: "3816061219", lat: -26.781995, lng: -65.236845
             },
             {
               nombre: "COMISARÍA LOS POCITOS - Campaña del Desierto y Av Virgen Generala",
               fijo: "03814373095",
-              celular: "3816069855"
+              celular: "3816069855", lat: -26.785615, lng: -65.215795
             },
             {
               nombre: "COMISARÍA VILLA OBRERA - J del Pino y Vertiz",
               fijo: "03814618551",
-              celular: "3814388183"
+              celular: "3814388183", lat: -26.737104, lng: -65.250645
             }
           ]
         }
@@ -2717,51 +2909,53 @@ const regionales = {
         {
           nombre: "ZONA 1 - Av Mitre y Ramon Simón - Aguilares",
           celular: "3816721923",
+          lat: -27.432071,
+          lng: -65.622375,
           hijos: [
             {
               nombre: "COMISARÍA AGUILARES - Av Mitre y R Simon",
               fijo: "03865481002",
-              celular: "3816060353"
+              celular: "3816060353", lat: -27.432071, lng: -65.622375
             },
             {
               nombre: "COMISARÍA ALPACHIRI - Ruta Nac 65 y Ruta Prov 330",
-              celular: "3814426279"
+              celular: "3814426279", lat: -27.339891, lng: -65.760984
             },
             {
               nombre: "SUB COMISARÍA ALTO VERDE - 12 Octubre y Belgrano",
-              celular: "3814388034"
+              celular: "3814388034", lat: -27.376654, lng: -65.609163
             },
             {
               nombre: "COMISARÍA ARCADIA - Cap Blas Cabrera y Alberdi",
-              celular: "3816069877"
+              celular: "3816069877", lat: -27.307724, lng: -65.577393
             },
             {
               nombre: "COMISARÍA CONCEPCIÓN - 9 de julio 40",
               fijo: "03865421339",
-              celular: "3816055129"
+              celular: "3816055129", lat: -27.335963, lng: -65.595697
             },
             {
               nombre: "COMISARÍA EL POLEAR - Camino Rural y Ruta 332 ",
-              celular: "3814426263"
+              celular: "3814426263", lat: -27.498262, lng: -65.566546
             },
             {
               nombre: "COMISARÍA LA TRINIDAD - Las Heras y Av Rivadavia",
               fijo: "03865491008",
-              celular: "3814388089"
+              celular: "3814388089", lat: -27.413710, lng: -65.516255
             },
             {
               nombre: "COMISARÍA LOS SARMIENTOS - 9 de Julio s/nº",
               fijo: "03865494010",
-              celular: "3816076492"
+              celular: "3816076492", lat: -27.413240, lng: -65.694581
             },
             {
               nombre: "COMISARÍA MEDINAS - 24 de Septiembre s/nº",
-              celular: "3814426284"
+              celular: "3814426284", lat: -27.422459, lng: -65.533009
             },
             {
               nombre: "COMISARÍA SANTA ANA - Carlos Pelegrini s/nº",
               fijo: "03865493022",
-              celular: "3816069823"
+              celular: "3816069823", lat: -27.475342, lng: -65.683123
             },
             {
               nombre: "DESTACAMENTO HOSPITAL CONCEPCIÓN - San Luis 150",
@@ -2775,80 +2969,82 @@ const regionales = {
           hijos: [
             {
               nombre: "COMISARÍA ATAHONA - Calle N° 5 s/n°",
-              celular: "3814426103"
+              celular: "3814426103", lat: -27.416049, lng: -65.287228
             },
             {
               nombre: "COMISARÍA CHICLIGASTA - Calle Sin Nombre",
-              celular: "3816056639"
+              celular: "3816056639", lat: -27.433661, lng: -65.165157
             },
             {
               nombre: "COMISARÍA GRANEROS - San Martín y 9 de Julio",
               fijo: "03891491024",
-              celular: "3814426113"
+              celular: "3814426113", lat: -27.650136, lng: -65.439801
             },
             {
               nombre: "COMISARÍA LA MADRID - Lamadrid 391",
               fijo: "03891421019",
-              celular: "3816064130"
+              celular: "3816064130", lat: -27.646148, lng: -65.248534
             },
             {
               nombre: "COMISARÍA MONTEAGUDO - Calle Nº 3 s/nº",
-              celular: "3814426363"
+              celular: "3814426363", lat: -27.509572, lng: -65.277016
             },
             {
               nombre: "COMISARÍA SANTA CRUZ - Calle Sin Nombre - Santa Cruz - Simoca ",
-              celular: "3816051608"
+              celular: "3816051608", lat: -27.389996, lng: -65.457315
             },
             {
               nombre: "COMISARÍA SIMOCA - Belgrano 310",
               fijo: "03863481106",
-              celular: "3814426300"
+              celular: "3814426300", lat: -27.262505, lng: -65.358640
             },
             {
               nombre: "COMISARÍA TACO RALO - Buenos Aires y San Juan",
-              celular: "3816069838"
+              celular: "3816069838", lat: -27.836895, lng: -65.194054
             },
             {
-              nombre: "COMISARÍA ÁRBOLES GRANDES - Ruta Prov 308"
+              nombre: "COMISARÍA ÁRBOLES GRANDES - Ruta Prov 308", lat: -27.685515, lng: -65.003691
             }
           ]
         },
         {
-          nombre: "ZONA 3 - Miguel M Campero 340 - Juan Bautista Alberdi",
-          celular: "3815001512",
+          nombre: "ZONA 3 - Miguel M Campero 340 - Juan Bautista Alberdi", 
+          celular: "3815001512", 
+          lat: -27.586143,
+          lng: -65.618133,
           hijos: [
             {
-              nombre: "COMISARÍA ESCABA - Ruta Prov 308 y Calle sin nombre"
+              nombre: "COMISARÍA ESCABA - Ruta Prov 308 y Calle sin nombre", lat: -27.668020, lng: -65.763872
             },
             {
               nombre: "COMISARÍA HUASA PAMPA SUR - Calle Sin Nombre - La Cocha",
-              celular: "3815326228"
+              celular: "3815326228", lat: -27.881209, lng: -65.582886
             },
             {
               nombre: "COMISARÍA J.B. ALBERDI - Miguel M Campero 340",
               fijo: "03865471142",
-              celular: "3816064325"
+              celular: "3816064325", lat: -27.586143, lng: -65.618133
             },
             {
               nombre: "COMISARÍA LA COCHA - San Marti­n s/nº",
               fijo: "03865496025",
-              celular: "3814388011"
+              celular: "3814388011", lat: -27.772061, lng: -65.588685
             },
             {
               nombre: "COMISARÍA LA INVERNADA - Calle Sin Nombre - El Sacrificio - La Cocha",
-              celular: "3816721496"
+              celular: "3816721496", lat: -27.653837, lng: -65.572773
             },
             {
               nombre: "COMISARÍA RUMI PUNCO - Juan Domingo Peron s/nº",
-              celular: "3815326099"
+              celular: "3815326099", lat: -27.984288, lng: -65.573786
             },
             {
               nombre: "COMISARÍA SAN IGNACIO - Ruta Prov 334 y Calle Sin Nombre - Los Pizarro - La Cocha",
-              celular: "3816060364"
+              celular: "3816060364", lat: -27.747687, lng: -65.635047
             },
             {
               nombre: "COMISARÍA VILLA BELGRANO - Independencia y 24 de Septiembre",
-              celular: "3816716106"
+              celular: "3816716106", lat: -27.530641, lng: -65.615143
             }
           ]
         }
@@ -2868,6 +3064,61 @@ function subtreeTieneTelefono(nodo) {
   if (nodo.hijos) return nodo.hijos.some(subtreeTieneTelefono);
   return false;
 }
+
+
+// ── Google Maps integrado ─────────────────────────────────
+// Detecta direcciones ya incluidas en el nombre de cada dependencia.
+// No requiere API Key: utiliza la vista de búsqueda de Google Maps dentro de un iframe.
+function obtenerDireccionMapa(nombre) {
+  // Todo lo que va despues del primer " - " en el nombre del nodo se considera
+  // dirección (así lo carga el organigrama de forma consistente en todo el
+  // árbol). Antes esta función exigía que el texto tuviera un número o una
+  // palabra de una lista fija (nombres de calles conocidas), por lo que
+  // direcciones rurales como "s/nº", "Camino Vecinal" o intersecciones de
+  // calles ("Perú y H Rodriguez") no se reconocían y esas dependencias se
+  // quedaban sin botón de mapa. Ahora se usa siempre el texto completo.
+  if (!nombre || !nombre.includes(' - ')) return '';
+  const partes = nombre.split(' - ');
+  return partes.slice(1).join(' - ').trim();
+}
+
+function abrirMapaModal(nombre, direccion, lat, lng) {
+  // Si el nodo tiene coordenadas cargadas manualmente (lat/lng), se usan esas
+  // coordenadas exactas para ubicar el mapa (nunca se muestran en pantalla).
+  // Si no, se busca por el texto de la dirección, como antes.
+  const tieneCoordenadas = typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng);
+  if (!direccion && !tieneCoordenadas) return;
+
+  const consultaMapa = tieneCoordenadas
+    ? (lat + ',' + lng)
+    : (direccion + ', Tucumán, Argentina');
+  const url = 'https://www.google.com/maps?q=' + encodeURIComponent(consultaMapa) + '&output=embed';
+  const urlAbrir = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(consultaMapa);
+
+  // El texto que ve la persona usuaria NUNCA son las coordenadas: es la
+  // dirección (si la hay) o, si no hay dirección de texto, el nombre de la
+  // dependencia. Así la búsqueda es clara y no confunde a la comunidad.
+  const textoMostrado = direccion ? (direccion + ', Tucumán, Argentina') : nombre;
+
+  document.getElementById('mapaTitulo').textContent = '📍 ' + nombre;
+  document.getElementById('mapaDireccion').textContent = textoMostrado;
+  document.getElementById('mapaFrame').src = url;
+  document.getElementById('mapaAbrir').href = urlAbrir;
+  document.getElementById('mapaModalOverlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarMapaModal() {
+  document.getElementById('mapaModalOverlay').classList.remove('visible');
+  document.getElementById('mapaFrame').src = '';
+  document.body.style.overflow = '';
+}
+
+function cerrarMapaModalOverlay(e) {
+  if (e.target === document.getElementById('mapaModalOverlay')) cerrarMapaModal();
+}
+
+
 
 function renderNodo(nodo, nivel) {
   const id = 'n' + Math.random().toString(36).substr(2,8);
@@ -2918,6 +3169,21 @@ function renderNodo(nodo, nivel) {
       tels.appendChild(a);
     }
     cab.appendChild(tels);
+  }
+
+  const direccionMapa = obtenerDireccionMapa(nodo.nombre);
+  const tieneCoordenadasManuales = typeof nodo.lat === 'number' && typeof nodo.lng === 'number';
+  if (direccionMapa || tieneCoordenadasManuales) {
+    const mapaBtn = document.createElement('button');
+    mapaBtn.className = 'mapa-btn';
+    mapaBtn.type = 'button';
+    mapaBtn.title = 'Ver ubicación en Google Maps';
+    mapaBtn.innerHTML = '<span>📍</span> Mapa';
+    mapaBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      abrirMapaModal(nodo.nombre, direccionMapa, nodo.lat, nodo.lng);
+    });
+    cab.appendChild(mapaBtn);
   }
 
   div.appendChild(cab);
@@ -3050,7 +3316,11 @@ function cerrarPdfModalOverlay(e) {
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') cerrarPdfModal();
+  if (e.key === 'Escape') {
+    cerrarMapaModal();
+    cerrarPdfModal();
+    cerrarPresentacionModal();
+  }
 });
 
 function _aplicarZoom() {
