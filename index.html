@@ -348,6 +348,7 @@
     white-space: nowrap;
     transition: background 0.15s, transform 0.1s;
     cursor: pointer;
+    margin-left: auto;
   }
   .mapa-btn:hover { background: var(--azul-claro); color: #fff; transform: translateY(-1px); }
   .nivel-0 > .nodo-cabecera .mapa-btn, .nivel-1 > .nodo-cabecera .mapa-btn {
@@ -437,10 +438,38 @@
     .titulo-principal .linea3 { font-size: 11px; }
     .toolbar { padding: 8px 12px; top: 0; position: relative; flex-wrap: wrap; }
     .search-box input { width: 160px; }
-    .contenedor { padding: 12px 8px 40px; }
+    .contenedor { padding: 12px 8px 40px; max-width: 100%; overflow-x: hidden; }
     .nivel-0 .etiqueta { font-size: 17px; }
     .nivel-1 .etiqueta { font-size: 13px; }
+
+    /* Evita que el contenido de una fila (etiqueta + teléfonos + mapa)
+       se salga del margen en pantallas angostas: se permite que la
+       fila pase a una segunda línea en vez de desbordar. */
+    .nodo-cabecera {
+      flex-wrap: wrap;
+      row-gap: 4px;
+      min-width: 0;
+    }
+    .etiqueta {
+      flex: 1 1 100%;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .telefonos, .mapa-btn { flex-shrink: 0; }
+
+    /* Reduce la sangría por nivel para dejar más ancho disponible */
+    .nivel-1 { margin-left: 0; }
+    .nivel-2 { margin-left: 12px; }
+    .nivel-3 { margin-left: 12px; }
+    .nivel-4 { margin-left: 10px; }
+    .nivel-5 { margin-left: 8px; }
+    .hijos { margin-left: 8px; padding-left: 8px; }
   }
+
+  /* Red de seguridad general: nada debería poder generar scroll
+     horizontal en la página, sea cual sea el nivel de anidamiento. */
+  html, body { overflow-x: hidden; }
 </style>
 </head>
 <body>
@@ -3183,7 +3212,7 @@ function renderNodo(nodo, nivel) {
     mapaBtn.className = 'mapa-btn';
     mapaBtn.type = 'button';
     mapaBtn.title = 'Ver ubicación en Google Maps';
-    mapaBtn.innerHTML = '<span>📍</span> Mapa';
+    mapaBtn.innerHTML = '<span>📍</span> Ver Ubicación';
     mapaBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       abrirMapaModal(nodo.nombre, direccionMapa, nodo.lat, nodo.lng);
