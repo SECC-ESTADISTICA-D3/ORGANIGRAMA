@@ -798,6 +798,7 @@ button.mg-rt{display:flex;align-items:center;gap:10px;width:100%;text-align:left
         <button class="pdf-zoom-reset" onclick="pdfZoomReset()">↺</button>
         <button class="pdf-zoom-reset" onclick="pdfZoomFit()" title="Ver completo">⛶</button>
       </div>
+      <button class="pdf-zoom-reset" onclick="descargarOrganigramaPdf()" title="Descargar PDF" style="background:var(--oro);color:var(--azul);font-weight:700;">⬇ PDF</button>
       <button class="pdf-cerrar" onclick="cerrarPdfModal()" title="Cerrar">✕</button>
     </div>
     <div class="pdf-cuerpo" id="pdfCuerpo">
@@ -4230,6 +4231,60 @@ function abrirPdfModal() {
   if (info) info.style.display = 'none';
   // ajustar a pantalla completa al abrir
   setTimeout(pdfZoomFit, 50);
+}
+
+function descargarOrganigramaPdf() {
+  try {
+    var img = document.getElementById('org-img');
+    var src = img.getAttribute('src');
+    var b64 = src.split(',')[1];
+    var bin = atob(b64), n = bin.length, png = new Uint8Array(n);
+    for (var i = 0; i < n; i++) png[i] = bin.charCodeAt(i);
+    var dv = new DataView(png.buffer);
+    var pos = 8, W = 0, H = 0, depth = 8, ctype = 3, plte = null, idat = [], idatLen = 0;
+    while (pos < n) {
+      var len = dv.getUint32(pos);
+      var type = String.fromCharCode(png[pos+4], png[pos+5], png[pos+6], png[pos+7]);
+      var d = png.subarray(pos + 8, pos + 8 + len);
+      if (type === 'IHDR') { W = dv.getUint32(pos+8); H = dv.getUint32(pos+12); depth = png[pos+16]; ctype = png[pos+17]; }
+      else if (type === 'PLTE') plte = d;
+      else if (type === 'IDAT') { idat.push(d); idatLen += d.length; }
+      pos += 12 + len;
+    }
+    if (ctype !== 3 || depth !== 8 || !plte) throw new Error('Formato de imagen no soportado');
+    var data = new Uint8Array(idatLen), o = 0;
+    idat.forEach(function (c) { data.set(c, o); o += c.length; });
+    var hex = '';
+    for (var k = 0; k < plte.length; k++) hex += (plte[k] < 16 ? '0' : '') + plte[k].toString(16);
+    var pw = W * 0.24, ph = H * 0.24; // ~300 dpi
+    var enc = new TextEncoder(), parts = [], offs = [], size = 0;
+    function put(x) { var u = typeof x === 'string' ? enc.encode(x) : x; parts.push(u); size += u.length; }
+    function obj(num, body) { offs[num] = size; put(num + ' 0 obj\n'); put(body); put('\nendobj\n'); }
+    put('%PDF-1.4\n');
+    obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+    obj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pw.toFixed(2) + ' ' + ph.toFixed(2) + '] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+    offs[4] = size;
+    put('4 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + W + ' /Height ' + H +
+        ' /ColorSpace [/Indexed /DeviceRGB ' + (plte.length / 3 - 1) + ' <' + hex + '>] /BitsPerComponent 8' +
+        ' /Filter /FlateDecode /DecodeParms << /Predictor 15 /Colors 1 /BitsPerComponent 8 /Columns ' + W + ' >>' +
+        ' /Length ' + data.length + ' >>\nstream\n');
+    put(data); put('\nendstream\nendobj\n');
+    var cs = 'q ' + pw.toFixed(2) + ' 0 0 ' + ph.toFixed(2) + ' 0 0 cm /Im0 Do Q';
+    obj(5, '<< /Length ' + cs.length + ' >>\nstream\n' + cs + '\nendstream');
+    var xref = size;
+    var x = 'xref\n0 6\n0000000000 65535 f \n';
+    for (var j = 1; j <= 5; j++) x += ('0000000000' + offs[j]).slice(-10) + ' 00000 n \n';
+    put(x + 'trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF');
+    var blob = new Blob(parts, { type: 'application/pdf' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'Organigrama_Institucional_Policia_Tucuman.pdf';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  } catch (e) {
+    alert('No se pudo generar el PDF: ' + e.message);
+  }
 }
 
 function cerrarPdfModal() {
