@@ -971,6 +971,30 @@ body.editando .oc-pen{display:inline-block}
   body.oc-printing .oc-pr{display:block}
 }
 </style>
+<style id="ajuste-movil-etiquetas">
+/* Ajuste automático de los nombres de dependencias en celulares:
+   el texto usa todo el ancho de la fila y los botones (teléfono / Ver Ubicación)
+   pasan a una línea propia debajo, así nunca se cortan palabras. */
+@media (max-width: 700px) {
+  .nodo-cabecera { flex-wrap: wrap; align-items: center; column-gap: 10px; row-gap: 8px; }
+  .nodo-cabecera .etiqueta,
+  .nivel-0 .etiqueta, .nivel-1 .etiqueta, .nivel-2 .etiqueta,
+  .nivel-3 .etiqueta, .nivel-4 .etiqueta, .nivel-5 .etiqueta {
+    flex: 1 1 calc(100% - 60px);
+    min-width: 0;
+    word-break: normal;
+    overflow-wrap: break-word;   /* solo corta si una palabra sola no entra en la línea */
+    hyphens: manual;
+  }
+  .nivel-0 .etiqueta { font-size: clamp(1.15rem, 5.6vw, 1.45rem); letter-spacing: .5px; line-height: 1.2; }
+  .nivel-1 .etiqueta { font-size: clamp(1.05rem, 5vw, 1.28rem); }
+  /* botones debajo del texto, alineados con él */
+  .nodo-cabecera > .telefonos,
+  .nodo-cabecera > .mapa-btn { flex: 0 0 auto; margin-left: 46px; max-width: calc(100% - 46px); }
+  .nodo-cabecera > .telefonos + .mapa-btn { margin-left: 0; }
+  .nodo-cabecera > .mapa-btn { white-space: nowrap; }
+}
+</style>
 </head>
 <body>
 
